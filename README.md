@@ -1,26 +1,109 @@
-# CDCgov GitHub Organization Open Source Project Template
-
-**Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
-
-**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
-
-## Access Request, Repo Creation Request
-
-* [CDC GitHub Open Project Request Form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) _[Requires a CDC Office365 login, if you do not have a CDC Office365 please ask a friend who does to submit the request on your behalf. If you're looking for access to the CDCEnt private organization, please use the [GitHub Enterprise Cloud Access Request form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUQjVJVDlKS1c0SlhQSUxLNVBaOEZCNUczVS4u).]_
-
-## Related documents
-
-* [Open Practices](open_practices.md)
-* [Rules of Behavior](rules_of_behavior.md)
-* [Thanks and Acknowledgements](thanks.md)
-* [Disclaimer](DISCLAIMER.md)
-* [Contribution Notice](CONTRIBUTING.md)
-* [Code of Conduct](code-of-conduct.md)
+# MycoSNP: BWA Pre-Process
 
 ## Overview
 
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
-  
+This repository contains the MycoSNP GATK Variants workflow, which consists of seven steps:
+
+1. Call variants using the GATK 4.1.4.1 HaplotypeCaller tool.
+2. Combine gVCF files from the HaplotypeCaller into a single VCF using the GATK 4.1.4.1 CombineGVCFs tool.
+3. Call genotypes using the GATK 4.1.4.1 GenotypeGVCFs tool.
+4. Filter the variants using the GATK 4.1.4.1 VariantFiltration tool and the default (but customizable) filter: 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10'.
+5. Run a customized VCF filtering script provided by the Broad Institute.
+6. Select only SNPs from the VCF files using the GATK 4.1.4.1 SelectVariants tool.
+7. Create a consensus sequence for each sample using BCFTools 1.9 and SeqTK 1.2.
+
+## Requirements
+
+Before installing and running this workflow, follow the instructions in the main repository to install the requirements: https://github.com/CDCgov/mycosnp
+
+## Installation
+
+First install GeneFlow and its dependencies as follows:
+
+1. Activate the [previously installed](https://github.com/CDCgov/mycosnp) Python virtual environment.
+
+    ```bash
+    cd ~/mycosnp
+    source gfpy/bin/activate
+    ```
+
+2. Clone and install the mycosnp-gatk-variants workflow.
+
+    ```bash
+    gf install-workflow --make-apps -g https://github.com/CDCgov/mycosnp-gatk-variants mycosnp-gatk-variants
+    ```
+
+    The workflow should now be installed in the `~/mycosnp/mycosnp-gatk-variants` directory.
+
+## Execution
+
+View the workflow parameter requirements using GeneFlow's `help` command:
+
+```
+cd ~/mycosnp
+gf help mycosnp-gatk-variants
+```
+
+Execute the workflow with a command similar to the following. Be sure to replace the `/path/to/indexed/reference` with your indexed reference created using the MycoSNP BWA Reference workflow, and replace the `/path/to/bam/index` with the path to the indexed BAM files created by the MycoSNP BWA Pre-Process workflow:
+
+```
+gf --log-level debug run mycosnp-gatk-variants \
+    -o ./output \
+    -n test-mycosnp-gatk-variants \
+    --in.input_folder /path/to/bam/index \
+    --in.reference_sequence /path/to/indexed/reference \
+    --param.pair_hmm_threads 8
+```
+
+Alternatively, to execute the workflow on an HPC system, you must first set the DRMAA library path environment variable. For example:
+
+```
+export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx-amd64/libdrmaa2.so
+```
+
+Note that the DRMAA library for your specific scheduler (either UGE/SGE or SLURM) must be installed, and the installed library path may be different in your environment. Once the environment has been configured, execute the workflow as follows:
+
+```
+gf --log-level debug run mycosnp-gatk-variants \
+    -o ./output \
+    -n test-mycosnp-gatk-variants \
+    --in.input_folder /path/to/bam/index \
+    --in.reference_sequence /path/to/indexed/reference \
+    --param.pair_hmm_threads 8 \
+    --ec default:gridengine \
+    --ep \
+        default.slots:8 \
+        'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR=' \
+```
+
+Arguments are explained below:
+
+1. ``-o ./output``: The workflow's output will be placed in the ``./output`` folder. This folder will be created if it doesn't already exist. 
+2. ``-n test-mycosnp-gatk-variants``: This is the name of the workflow job. A sub-folder with the name ``test-mycosnp-gatk-variants`` will be created in ``./output`` for the workflow output. 
+3. ``--in.input_folder``: This must point to an output folder created by the MycoSNP BWA Pre-Process workflow, and should contain a sub-folder for each sample. Each sub-folder must contain a BAM file and a BAM index file (.bai)
+4. ``--in.reference_sequence``: This must point to an output folder created by the MycoSNP BWA Reference workflow, and should contain a reference sequence (FASTA), a .dict file, and a refererence sequence index (.fai)
+5. ``--param.pair_hmm_threads 8``: Number of threads to use for GATK's variant calling algorithm. Recommended threads is 8.
+6. ``--ec default:gridengine``: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
+7. ``--ep``: This specifies one or more workflow "execution parameters".
+   a. ``default.slots:8``: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow. The recommended number of slots is 8, and should match the pair_hmm_threads parameter.
+   b. ``'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='``: This specifies a number of commands to execute on each HPC node to prepare that node for execution. This commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
+
+After successful execution, the output directory should contain the following structure:
+
+.. code-block:: bash
+
+    ├── consensus
+    │   ├── consensus
+    │   └── _log
+    ├── gatk-selectvariants
+    │   ├── gatk-selectvariants
+    │   └── _log
+    └── vcf-filter
+        ├── _log
+        └── vcf-filter
+
+The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``gatk-selectvariants`` folder contains VCF files for all samples. And the ``vcf-filter`` folder contains filtered VCF files. 
+
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in

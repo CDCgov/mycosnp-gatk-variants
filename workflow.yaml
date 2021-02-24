@@ -1,0 +1,151 @@
+%YAML 1.1
+---
+gfVersion: v2.0
+class: workflow
+
+name: MycoSNP GATK Variants
+description: Call variants for the MycoSNP workflow using GATK.
+version: '0.12'
+git: https://git.biotech.cdc.gov/geneflow-workflows/mycosnp-gatk-variants.git
+
+inputs:
+  input_folder:
+    label: Input Directory
+    description: Input directory containing BAM and BAI files
+    type: Directory
+    default: /input/files
+    enable: true
+    visible: true
+
+  reference_sequence:
+    label: Reference Sequence
+    description: Reference sequence directory with FASTA, index, and dict files
+    type: Directory
+    default: /reference/sequence
+    enable: true
+    visible: true
+
+parameters:
+  sample_ploidy:
+    label: Sample Ploidy
+    description: Ploidy of sample
+    type: int
+    default: 1
+    enable: true
+    visible: true
+
+  filter_expression:
+    label: Variant Filter Expression
+    description: Filter criteria for variants
+    type: string
+    default: 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10'
+    enable: true
+    visible: true
+
+  pair_hmm_threads:
+    label: Native PairHMM Threads
+    description: Number of threads for native pair HMM
+    type: int
+    default: 4
+    enable: true
+    visible: true
+
+final_output:
+- gatk-selectvariants
+- vcf-filter
+- consensus
+
+apps:
+  gatk-haplotypecaller:
+    git: https://gitlab.com/geneflow/apps/gatk-haplotypecaller-gf2.git
+    version: '4.1.4.1-01'
+  gatk-combinegvcfs:
+    git: https://gitlab.com/geneflow/apps/gatk-combinegvcfs-gf2.git
+    version: '4.1.4.1-01'
+  gatk-genotypegvcfs:
+    git: https://gitlab.com/geneflow/apps/gatk-genotypegvcfs-gf2.git
+    version: '4.1.4.1-01'
+  gatk-variantfiltration:
+    git: https://gitlab.com/geneflow/apps/gatk-variantfiltration-gf2.git
+    version: '4.1.4.1-01'
+  gatk-selectvariants:
+    git: https://gitlab.com/geneflow/apps/gatk-selectvariants-gf2.git
+    version: '4.1.4.1-01'
+  broad-vcf-filter:
+    git: https://gitlab.com/geneflow/apps/broad-vcf-filter-gf2.git
+    version: '0.2'
+  bcftools-consensus:
+    git: https://gitlab.com/geneflow/apps/bcftools-consensus-gf2.git
+    version: '1.9-01'
+
+steps:
+  gatk-haplotypecaller:
+    app: gatk-haplotypecaller
+    depend: []
+    map:
+      uri: ${workflow->input_folder}
+      regex: ^(?!_log)(.*)
+    template:
+      input: ${workflow->input_folder}/${1}
+      reference_sequence: ${workflow->reference_sequence}
+      sample_ploidy: ${workflow->sample_ploidy}
+      emit_reference_confidence: GVCF
+      pair_hmm_threads: ${workflow->pair_hmm_threads}
+      output: ${1}
+
+  gatk-combinegvcfs:
+    app: gatk-combinegvcfs
+    depend:
+    - gatk-haplotypecaller
+    template:
+      input: ${gatk-haplotypecaller->output}
+      reference_sequence: ${workflow->reference_sequence}
+      output: gatk-combinegvcfs
+
+  gatk-genotypegvcfs:
+    app: gatk-genotypegvcfs
+    depend:
+    - gatk-combinegvcfs
+    template:
+      input: ${gatk-combinegvcfs->output}/gatk-combinegvcfs/gatk-combinegvcfs.g.vcf
+      reference_sequence: ${workflow->reference_sequence}
+      output: gatk-genotypegvcfs
+
+  gatk-variantfiltration:
+    app: gatk-variantfiltration
+    depend:
+    - gatk-genotypegvcfs
+    template:
+      input: ${gatk-genotypegvcfs->output}/gatk-genotypegvcfs/gatk-genotypegvcfs.vcf
+      reference_sequence: ${workflow->reference_sequence}
+      filter_expression: ${workflow->filter_expression}
+      filter_name: filter
+      output: gatk-variantfiltration
+
+  vcf-filter:
+    app: broad-vcf-filter
+    depend:
+    - gatk-variantfiltration
+    template:
+      input: ${gatk-variantfiltration->output}/gatk-variantfiltration/gatk-variantfiltration.vcf
+      output: vcf-filter
+
+  gatk-selectvariants:
+    app: gatk-selectvariants
+    depend:
+    - vcf-filter
+    template:
+      input: ${vcf-filter->output}/vcf-filter/vcf-filter.vcf
+      reference_sequence: ${workflow->reference_sequence}
+      select_type_to_include: SNP
+      output: gatk-selectvariants
+
+  consensus:
+    app: bcftools-consensus
+    depend:
+    - gatk-selectvariants
+    template:
+      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
+      reference_sequence: ${workflow->reference_sequence}
+      output: consensus
+...
