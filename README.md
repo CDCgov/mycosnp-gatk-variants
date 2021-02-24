@@ -90,17 +90,17 @@ Arguments are explained below:
 
 After successful execution, the output directory should contain the following structure:
 
-.. code-block:: bash
-
-    ├── consensus
-    │   ├── consensus
-    │   └── _log
-    ├── gatk-selectvariants
-    │   ├── gatk-selectvariants
-    │   └── _log
+```
+├── consensus
+│   ├── consensus
+│   └── _log
+├── gatk-selectvariants
+│   ├── gatk-selectvariants
+│   └── _log
+└── vcf-filter
+    ├── _log
     └── vcf-filter
-        ├── _log
-        └── vcf-filter
+```
 
 The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``gatk-selectvariants`` folder contains VCF files for all samples. And the ``vcf-filter`` folder contains filtered VCF files. 
 
