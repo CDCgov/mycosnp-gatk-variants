@@ -70,7 +70,7 @@ gf --log-level debug run mycosnp-gatk-variants \
     --in.input_folder /path/to/bam/index \
     --in.reference_sequence /path/to/indexed/reference \
     --param.pair_hmm_threads 8 \
-    --ec default:gridengine \
+    --ec default:slurm \
     --ep \
         default.slots:8 \
         'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR=' \
@@ -83,7 +83,7 @@ Arguments are explained below:
 3. ``--in.input_folder``: This must point to an output folder created by the MycoSNP BWA Pre-Process workflow, and should contain a sub-folder for each sample. Each sub-folder must contain a BAM file and a BAM index file (.bai)
 4. ``--in.reference_sequence``: This must point to an output folder created by the MycoSNP BWA Reference workflow, and should contain a reference sequence (FASTA), a .dict file, and a refererence sequence index (.fai)
 5. ``--param.pair_hmm_threads 8``: Number of threads to use for GATK's variant calling algorithm. Recommended threads is 8.
-6. ``--ec default:gridengine``: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
+6. ``--ec default:slurm``: This is the workflow "execution context", which specifies where the workflow will be executed. "gridengine" or "slurm" is recommended, as this will execute the workflow on the HPC. However, "local" may also be used. 
 7. ``--ep``: This specifies one or more workflow "execution parameters".
    a. ``default.slots:8``: This specifies the number of CPUs or "slots" to request from the gridengine HPC when executing the workflow. The recommended number of slots is 8, and should match the pair_hmm_threads parameter.
    b. ``'default.init:echo `hostname` && mkdir -p $HOME/tmp && export TMPDIR=$HOME/tmp && export _JAVA_OPTIONS=-Djava.io.tmpdir=$HOME/tmp && export XDG_RUNTIME_DIR='``: This specifies a number of commands to execute on each HPC node to prepare that node for execution. This commands ensure that a local "tmp" directory is used (rather than /tmp), and also resets an environment variable that may interfere with correct execution of singularity containers.
