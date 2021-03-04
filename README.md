@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains the MycoSNP GATK Variants workflow, which consists of seven steps:
+This repository contains the MycoSNP GATK Variants workflow, which consists of eight steps:
 
 1. Call variants using the GATK 4.1.4.1 HaplotypeCaller tool.
 2. Combine gVCF files from the HaplotypeCaller into a single VCF using the GATK 4.1.4.1 CombineGVCFs tool.
@@ -11,6 +11,7 @@ This repository contains the MycoSNP GATK Variants workflow, which consists of s
 5. Run a customized VCF filtering script provided by the Broad Institute.
 6. Select only SNPs from the VCF files using the GATK 4.1.4.1 SelectVariants tool.
 7. Create a consensus sequence for each sample using BCFTools 1.9 and SeqTK 1.2.
+8. Create a multi-fasta file from the VCF SNP positions using a custom script from Broad.
 
 ## Requirements
 

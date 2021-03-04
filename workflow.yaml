@@ -53,6 +53,7 @@ parameters:
 final_output:
 - gatk-selectvariants
 - vcf-filter
+- vcf-to-fasta
 - consensus
 
 apps:
@@ -74,6 +75,9 @@ apps:
   broad-vcf-filter:
     git: https://gitlab.com/geneflow/apps/broad-vcf-filter-gf2.git
     version: '0.3'
+  broad-vcf-to-fasta:
+    git: https://gitlab.com/geneflow/apps/broad-vcf-to-fasta-gf2.git
+    version: '0.1'
   bcftools-consensus:
     git: https://gitlab.com/geneflow/apps/bcftools-consensus-gf2.git
     version: '1.9-01'
@@ -139,6 +143,14 @@ steps:
       reference_sequence: ${workflow->reference_sequence}
       select_type_to_include: SNP
       output: gatk-selectvariants
+
+  vcf-to-fasta:
+    app: broad-vcf-to-fasta
+    depend:
+    - gatk-selectvariants
+    template:
+      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
+      output: vcf-to-fasta
 
   consensus:
     app: bcftools-consensus
