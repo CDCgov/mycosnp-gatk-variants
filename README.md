@@ -1,4 +1,4 @@
-# MycoSNP: BWA Pre-Process
+# MycoSNP: GATK Variants
 
 ## Overview
 
