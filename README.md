@@ -95,6 +95,9 @@ After successful execution, the output directory should contain the following st
 ├── consensus
 │   ├── consensus
 │   └── _log
+├── vcf-to-fasta
+│   ├── vcf-to-fasta
+│   └── _log
 ├── gatk-selectvariants
 │   ├── gatk-selectvariants
 │   └── _log
@@ -103,7 +106,7 @@ After successful execution, the output directory should contain the following st
     └── vcf-filter
 ```
 
-The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``gatk-selectvariants`` folder contains VCF files for all samples. And the ``vcf-filter`` folder contains filtered VCF files. 
+The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``vcf-to-fasta`` folder contains a multi-fasta file with only SNP positions. The ``gatk-selectvariants`` folder contains VCF files for all samples. And the ``vcf-filter`` folder contains filtered VCF files. 
 
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
