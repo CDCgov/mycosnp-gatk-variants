@@ -5,7 +5,7 @@ class: workflow
 
 name: MycoSNP GATK Variants
 description: Call variants for the MycoSNP workflow using GATK.
-version: '0.16'
+version: '0.17'
 git: https://git.biotech.cdc.gov/geneflow-workflows/mycosnp-gatk-variants.git
 
 inputs:
