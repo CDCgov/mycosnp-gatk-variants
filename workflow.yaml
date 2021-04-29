@@ -93,7 +93,7 @@ apps:
     version: '0.3'
   broad-vcf-to-fasta:
     git: https://gitlab.com/geneflow/apps/broad-vcf-to-fasta-gf2.git
-    version: '0.1'
+    version: '0.2'
   bcftools-consensus:
     git: https://gitlab.com/geneflow/apps/bcftools-consensus-gf2.git
     version: '1.9-01'
