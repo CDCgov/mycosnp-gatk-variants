@@ -50,6 +50,22 @@ parameters:
     enable: true
     visible: true
 
+  max_amb_samples:
+    label: Max Ambiguous Samples
+    description: Max number of samples with ambiguous calls for inclusion
+    type: int
+    default: 1000000
+    enable: true
+    visible: true
+
+  max_perc_amb_samples:
+    label: Max Percent Ambiguous Samples
+    description: Max percent of samples with ambiguous calls for inclusion
+    type: int
+    default: 
+    enable: true
+    visible: true
+
 final_output:
 - gatk-selectvariants
 - vcf-filter
@@ -150,6 +166,8 @@ steps:
     - gatk-selectvariants
     template:
       input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
+      max_amb_samples: ${workflow->max_amb_samples}
+      max_prec_amb_samples: ${workflow->max_perc_amb_samples}
       output: vcf-to-fasta
 
   consensus:
