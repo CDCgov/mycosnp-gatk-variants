@@ -167,7 +167,7 @@ steps:
     template:
       input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
       max_amb_samples: ${workflow->max_amb_samples}
-      max_prec_amb_samples: ${workflow->max_perc_amb_samples}
+      max_perc_amb_samples: ${workflow->max_perc_amb_samples}
       output: vcf-to-fasta
 
   consensus:
