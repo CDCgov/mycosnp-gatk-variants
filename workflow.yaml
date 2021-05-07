@@ -5,7 +5,7 @@ class: workflow
 
 name: MycoSNP GATK Variants
 description: Call variants for the MycoSNP workflow using GATK.
-version: '0.18'
+version: '0.19'
 git: https://git.biotech.cdc.gov/geneflow-workflows/mycosnp-gatk-variants.git
 
 inputs:
@@ -87,7 +87,7 @@ apps:
     version: '4.1.4.1-01'
   gatk-selectvariants:
     git: https://gitlab.com/geneflow/apps/gatk-selectvariants-gf2.git
-    version: '4.1.4.1-01'
+    version: '4.1.4.1-02'
   broad-vcf-filter:
     git: https://gitlab.com/geneflow/apps/broad-vcf-filter-gf2.git
     version: '0.3'
@@ -165,7 +165,7 @@ steps:
     depend:
     - gatk-selectvariants
     template:
-      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
+      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants-clean.vcf
       max_amb_samples: ${workflow->max_amb_samples}
       max_perc_amb_samples: ${workflow->max_perc_amb_samples}
       output: vcf-to-fasta
@@ -175,7 +175,7 @@ steps:
     depend:
     - gatk-selectvariants
     template:
-      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants.vcf
+      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants-clean.vcf
       reference_sequence: ${workflow->reference_sequence}
       output: consensus
 ...
