@@ -97,21 +97,27 @@ Arguments are explained below:
 After successful execution, the output directory should contain the following structure:
 
 ```
-├── consensus
-│   ├── consensus
+├── vcf-filter
+│   ├── vcf-filter
 │   └── _log
-├── vcf-to-fasta
-│   ├── vcf-to-fasta
+├── split-vcf-broad
+│   ├── split-vcf-broad
 │   └── _log
 ├── gatk-selectvariants
 │   ├── gatk-selectvariants
 │   └── _log
-└── vcf-filter
+├── split-vcf-selectvariants
+│   ├── split-vcf-selectvariants
+│   └── _log
+├── consensus
+│   ├── consensus
+│   └── _log
+└── vcf-to-fasta
     ├── _log
-    └── vcf-filter
+    └── vcf-to-fasta
 ```
 
-The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``vcf-to-fasta`` folder contains a multi-fasta file with only SNP positions. The ``gatk-selectvariants`` folder contains VCF files for all samples. And the ``vcf-filter`` folder contains filtered VCF files. 
+The ``consensus`` folder contains each consensus sequence FASTA in separate files. The ``vcf-to-fasta`` folder contains a multi-fasta file with only SNP positions. The ``gatk-selectvariants`` folder contains a VCF file with all samples, and only SNP positions. And the ``vcf-filter`` folder contains a VCF file filtered using a custom script provided by Broad. The ``split-vcf-*`` folders contain VCF files split by sample for each of the filtering steps. 
 
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
