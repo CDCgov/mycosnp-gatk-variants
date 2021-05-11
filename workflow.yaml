@@ -62,7 +62,7 @@ parameters:
     label: Max Percent Ambiguous Samples
     description: Max percent of samples with ambiguous calls for inclusion
     type: int
-    default: 
+    default: "0"
     enable: true
     visible: true
 
@@ -98,7 +98,7 @@ apps:
     version: '1.9-01'
   broad-vcf-to-fasta:
     git: https://gitlab.com/geneflow/apps/broad-vcf-to-fasta-gf2.git
-    version: '0.2'
+    version: '0.3'
   bcftools-consensus:
     git: https://gitlab.com/geneflow/apps/bcftools-consensus-gf2.git
     version: '1.9-01'
