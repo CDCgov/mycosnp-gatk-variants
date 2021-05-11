@@ -2,16 +2,18 @@
 
 ## Overview
 
-This repository contains the MycoSNP GATK Variants workflow, which consists of eight steps:
+This repository contains the MycoSNP GATK Variants workflow, which consists of 10 steps:
 
 1. Call variants using the GATK 4.1.4.1 HaplotypeCaller tool.
 2. Combine gVCF files from the HaplotypeCaller into a single VCF using the GATK 4.1.4.1 CombineGVCFs tool.
 3. Call genotypes using the GATK 4.1.4.1 GenotypeGVCFs tool.
 4. Filter the variants using the GATK 4.1.4.1 VariantFiltration tool and the default (but customizable) filter: 'QD < 2.0 || FS > 60.0 || MQ < 40.0 || DP < 10'.
 5. Run a customized VCF filtering script provided by the Broad Institute.
-6. Select only SNPs from the VCF files using the GATK 4.1.4.1 SelectVariants tool.
-7. Create a consensus sequence for each sample using BCFTools 1.9 and SeqTK 1.2.
-8. Create a multi-fasta file from the VCF SNP positions using a custom script from Broad.
+6. Split the filtered VCF file by sample. 
+7. Select only SNPs from the VCF files using the GATK 4.1.4.1 SelectVariants tool.
+8. Split the VCF file with SNPs by sample.
+9. Create a consensus sequence for each sample using BCFTools 1.9 and SeqTK 1.2.
+10. Create a multi-fasta file from the VCF SNP positions using a custom script from Broad.
 
 ## Requirements
 

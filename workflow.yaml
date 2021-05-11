@@ -67,8 +67,10 @@ parameters:
     visible: true
 
 final_output:
-- gatk-selectvariants
 - vcf-filter
+- split-vcf-broad
+- gatk-selectvariants
+- split-vcf-selectvariants
 - vcf-to-fasta
 - consensus
 
@@ -91,6 +93,9 @@ apps:
   broad-vcf-filter:
     git: https://gitlab.com/geneflow/apps/broad-vcf-filter-gf2.git
     version: '0.3'
+  bcftools-split-vcf:
+    git: https://gitlab.com/geneflow/apps/bcftools-split-vcf-gf2.git
+    version: '1.9-01'
   broad-vcf-to-fasta:
     git: https://gitlab.com/geneflow/apps/broad-vcf-to-fasta-gf2.git
     version: '0.2'
@@ -150,6 +155,14 @@ steps:
       input: ${gatk-variantfiltration->output}/gatk-variantfiltration/gatk-variantfiltration.vcf
       output: vcf-filter
 
+  split-vcf-broad:
+    app: bcftools-split-vcf
+    depend:
+    - vcf-filter
+    template:
+      input: ${vcf-filter->output}/vcf-filter/vcf-filter.vcf
+      output: split-vcf-broad
+
   gatk-selectvariants:
     app: gatk-selectvariants
     depend:
@@ -159,6 +172,14 @@ steps:
       reference_sequence: ${workflow->reference_sequence}
       select_type_to_include: SNP
       output: gatk-selectvariants
+
+  split-vcf-selectvariants:
+    app: bcftools-split-vcf
+    depend:
+    - gatk-selectvariants:
+    template:
+      input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants-clean.vcf
+      output: split-vcf-selectvariants
 
   vcf-to-fasta:
     app: broad-vcf-to-fasta
