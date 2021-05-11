@@ -176,7 +176,7 @@ steps:
   split-vcf-selectvariants:
     app: bcftools-split-vcf
     depend:
-    - gatk-selectvariants:
+    - gatk-selectvariants
     template:
       input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants-clean.vcf
       output: split-vcf-selectvariants
