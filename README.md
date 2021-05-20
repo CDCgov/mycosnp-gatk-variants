@@ -38,6 +38,12 @@ First install GeneFlow and its dependencies as follows:
 
     The workflow should now be installed in the `~/mycosnp/mycosnp-gatk-variants` directory.
 
+    Note: To update the workflow, run the `install-workflow` command with the `-f` option as follows:
+
+    ```bash
+    gf install-workflow --make-apps -f -g https://github.com/CDCgov/mycosnp-gatk-variants mycosnp-gatk-variants
+    ```
+
 ## Execution
 
 View the workflow parameter requirements using GeneFlow's `help` command:
