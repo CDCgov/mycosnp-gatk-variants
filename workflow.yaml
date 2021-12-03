@@ -5,7 +5,7 @@ class: workflow
 
 name: MycoSNP GATK Variants
 description: Call variants for the MycoSNP workflow using GATK.
-version: '0.21'
+version: '0.22'
 git: https://github.com/CDCgov/mycosnp-gatk-variants.git
 
 inputs:
@@ -73,6 +73,7 @@ final_output:
 - split-vcf-selectvariants
 - vcf-to-fasta
 - consensus
+- vcf-qc-report
 
 apps:
   gatk-haplotypecaller:
@@ -80,7 +81,7 @@ apps:
     version: '4.1.4.1-01'
   gatk-combinegvcfs:
     git: https://gitlab.com/geneflow/apps/gatk-combinegvcfs-gf2.git
-    version: '4.1.4.1-01'
+    version: '4.1.4.1-02'
   gatk-genotypegvcfs:
     git: https://gitlab.com/geneflow/apps/gatk-genotypegvcfs-gf2.git
     version: '4.1.4.1-01'
@@ -102,6 +103,9 @@ apps:
   bcftools-consensus:
     git: https://gitlab.com/geneflow/apps/bcftools-consensus-gf2.git
     version: '1.9-01'
+  vcf-qc-report:
+    git: https://gitlab.com/geneflow/apps/vcf-consensus-report-gf2.git
+    version: '0.1'
 
 steps:
   gatk-haplotypecaller:
@@ -199,4 +203,12 @@ steps:
       input: ${gatk-selectvariants->output}/gatk-selectvariants/gatk-selectvariants-clean.vcf
       reference_sequence: ${workflow->reference_sequence}
       output: consensus
+
+  vcf-qc-report:
+    app: vcf-qc-report
+    depend:
+    - vcf-to-fasta
+    template:
+      fasta: ${vcf-to-fasta->output}/vcf-to-fasta/vcf-to-fasta.fasta
+      output: vcf-qc-report.txt
 ...
