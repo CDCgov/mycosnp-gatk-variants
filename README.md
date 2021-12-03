@@ -64,7 +64,16 @@ gf --log-level debug run mycosnp-gatk-variants \
     --param.max_perc_amb_samples 10 \
     --param.pair_hmm_threads 8
 ```
-
+You can test this command out with the test data that was installed with the workflow as follows:
+```
+gf --log-level debug run mycosnp-gatk-variants \
+    -o ./output \
+    -n test-mycosnp-gatk-variants \
+    --in.input_folder ~/mycosnp/mycosnp-gatk-variants/data/bam_index \
+    --in.reference_sequence ~/mycosnp/mycosnp-gatk-variants/data/indexed_reference \
+    --param.max_perc_amb_samples 10 \
+    --param.pair_hmm_threads 8
+```
 Alternatively, to execute the workflow on an HPC system, you must first set the DRMAA library path environment variable. For example:
 
 ```
